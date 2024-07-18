@@ -1,15 +1,15 @@
-﻿using EstacionamentoAPI.Proprieties;
-using Microsoft.AspNetCore.Http.Timeouts;
-
+﻿using EstacionamentoAPI.Entities;
 namespace EstacionamentoAPI.Repositories
 {
     public interface IEstacionamentoRepository
     {
-        IEnumerable<Carro> GetCarros();
-        Carro GetById(Guid id);
-        Carro EntradaCarro(string tipo);
-        Carro SaidaCarro(Guid id);
-        Carro AlterarDados(Guid id, string tipo);
-
+        Task<IEnumerable<Ticket>> ListData();
+        Task<Ticket> CheckInTicket(decimal? price);
+        Task<Ticket> UpdateData(Guid id, DateTime? updateCheckIn, decimal? price);
+        Task<Ticket> GetById(Guid id);
+        Task<string> FindCode(string code);
+        Task Delete(Guid id);
+        Task<bool> CheckStatus(Guid id);
+        Task<Ticket> CheckOutTicket(Guid id);
     }
 }

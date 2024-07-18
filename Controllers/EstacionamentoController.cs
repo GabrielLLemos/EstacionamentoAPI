@@ -1,8 +1,8 @@
-﻿using EstacionamentoAPI.Proprieties;
+﻿using EstacionamentoAPI.Entities;
 using EstacionamentoAPI.Repositories;
 using EstacionamentoAPI.Requests;
+using EstacionamentoAPI.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Runtime.InteropServices;
 
 namespace EstacionamentoAPI.Controllers
 {
@@ -10,49 +10,74 @@ namespace EstacionamentoAPI.Controllers
     [Route("api/[Controller]")]
     public class EstacionamentoController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult<List<Carro>> GetList([FromBody] IEstacionamentoRepository carroRepository)
-        {
-            var carros = carroRepository.GetCarros().ToList();
-
-            return Ok(carros);
-        }
-
-        [HttpGet]
-        public ActionResult<Carro> GetCarro(
-            Guid id,
-            [FromServices] IEstacionamentoRepository estacionamentoRepository
-            )
-        {
-            var carro = estacionamentoRepository;
-
-            if (carro == null)
-                return NotFound();
-            
-            return Ok(carro);
-        }
-
         [HttpPost]
-        public ActionResult<Carro> PostCarro(
-            [FromBody] CarroRequest request,
-            [FromServices] IEstacionamentoRepository estacionamentoRepository
+        public ActionResult<Ticket> Post
+            (
+                decimal? price,
+                [FromServices] IEstacionamentoService estacionamentoService
             )
         {
-            var carro = new Carro(request.tipo);
-
-            estacionamentoRepository.EntradaCarro(carro.TipoDeVeiculo);
-
-            return Ok(carro);
+            var checkIn = estacionamentoService.CheckIn(price);
+            return Ok(checkIn);
         }
 
-        [HttpPut]
-        public ActionResult Put(
-            Guid id,
-            string tipo,
-            [FromServices] IEstacionamentoRepository estacionamentoRepository
+        [HttpGet]
+        public ActionResult<List<Ticket>> GetTickets
+            (
+                [FromServices] IEstacionamentoRepository estacionamentoRepository
             )
         {
-            estacionamentoRepository.AlterarDados(id, tipo);
+            var tickets = estacionamentoRepository.ListData();
+
+            return Ok(tickets);
+        }
+
+        [HttpGet("{id}")]
+        public ActionResult<Ticket> GetId
+            (
+                [FromBody] Guid id,
+                [FromServices] IEstacionamentoRepository estacionamentoRepository
+            )
+        {
+            var ticket = estacionamentoRepository.GetById(id);
+            
+            return Ok(ticket);
+        }
+
+        [HttpPut("{id}")]
+        public ActionResult UpdateData
+            (
+                [FromBody] Guid id,
+                [FromBody] UpdateDataRequest requestBody,
+                [FromServices] IEstacionamentoService estacionamentoService
+            )
+        {
+            var ticket = estacionamentoService.Update(id, requestBody.DateTime, requestBody.Price);
+
+            return Ok(ticket);
+        }
+
+        [HttpPut("{id}")]
+        public ActionResult Exit
+            (
+                [FromBody] Guid id,
+                [FromServices] IEstacionamentoService estacionamentoService
+            )
+        {
+            var ticketCheckOut = estacionamentoService.CheckOut(id);
+
+            return Ok(ticketCheckOut);
+        }
+
+
+        [HttpDelete("{id}")]
+        public ActionResult Delete
+            (
+                [FromBody] Guid id,
+                [FromServices] IEstacionamentoRepository estacionamentoRepository
+            )
+        {
+            estacionamentoRepository.Delete(id);
 
             return NoContent();
         }
