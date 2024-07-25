@@ -7,7 +7,6 @@ namespace EstacionamentoAPI.Entities
         public DateTime? CheckInCurrent { get; private set; }
         public DateTime? CheckOutCurrent { get; private set; }
         public bool Status {  get; private set; }
-        public string Code { get; private set; }
         public decimal? PricePerHour {  get; private set; }
 
         public Ticket(decimal? price) 
@@ -18,7 +17,6 @@ namespace EstacionamentoAPI.Entities
         }
 
         public void Exit () => CheckOutCurrent = DateTime.Now;
-        public void SetCode(string code) => Code = code;
         public void UpdateCheckIn(DateTime? date) => CheckInCurrent = date;
         public void UpdatePricePerHour(decimal? pricePerHour) => PricePerHour = pricePerHour;
         public void CheckStatus(Guid id)

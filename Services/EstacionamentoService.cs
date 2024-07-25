@@ -15,40 +15,28 @@ namespace EstacionamentoAPI.Services
             _estacionamentoRepository = estacionamentoRepository;
         }
 
-        public Ticket CheckIn(decimal? price)
+        public async Task<Ticket> CheckIn(decimal? price)
         {
-            var newCheckIn = _estacionamentoRepository.CheckInTicket(price);
-            var code = TicketCodeHelper.GenerateTicketCode(TicketConstant.CodeSize);
-            var existingCode = _estacionamentoRepository.FindCode(code);
+            var newCheckIn = await _estacionamentoRepository.CheckInTicket(price);
 
-
-            while (existingCode != null)
-            {
-                code = TicketCodeHelper.GenerateTicketCode(TicketConstant.CodeSize);
-            }
-
-            newCheckIn.SetCode(code);
             return newCheckIn;
         }
 
         //CheckOut
-        public Ticket CheckOut(Guid id)
+        public async Task<Ticket> CheckOut(Guid id)
         {
-            var existingTicket = _estacionamentoRepository.CheckOutTicket(id);
-            
+            var existingTicket = await _estacionamentoRepository.GetById(id);
+            var today = DateTime.Now;
+
+            if (existingTicket.CheckInCurrent > today)
+                throw new ArgumentException("Data inválida.");
+
+            await _estacionamentoRepository.UpdateData(id, today, null, null);
+
             return existingTicket;
         }
 
         //Update
-        public Ticket Update(Guid id, DateTime? updateCheckIn, decimal? price)
-        {
-            var update = _estacionamentoRepository.UpdateData(id, updateCheckIn, price);
-            var parkingStatus = _estacionamentoRepository.CheckStatus(id);
 
-            if (parkingStatus != false)
-                throw new ArgumentException("Não é possível fazer alterações, pois o veículo já saiu do estacionamento.");
-
-            return update;
-        }
     }
 }

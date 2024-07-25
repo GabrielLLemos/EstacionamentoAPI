@@ -4,8 +4,7 @@ namespace EstacionamentoAPI.Services
 {
     public interface IEstacionamentoService
     {
-        Ticket CheckIn(decimal? price);
-        Ticket CheckOut(Guid id);
-        Ticket Update(Guid id, DateTime? updateCheckIn, decimal? price);
+        Task<Ticket> CheckIn(decimal? price);
+        Task<Ticket> CheckOut(Guid id);
     }
 }

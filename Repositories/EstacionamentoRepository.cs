@@ -41,14 +41,6 @@ namespace EstacionamentoAPI.Repositories
             return await _ticketCollection.Find(ticket => ticket.Id == id).FirstOrDefaultAsync();
         }
 
-        //Encontrar código
-        public async Task<string> FindCode(string code)
-        {
-            var ticket = await _ticketCollection.Find(ticket => ticket.Code == code).FirstOrDefaultAsync();
-
-            return ticket.Code;
-        }
-
         //Listar Tickets
         public async Task<IEnumerable<Ticket>> ListData()
         {
@@ -56,15 +48,29 @@ namespace EstacionamentoAPI.Repositories
         }
 
         //Alterar Tickets
-        public async Task<Ticket> UpdateData(Guid id, DateTime? updateCheckIn, decimal? price)
+        public async Task<Ticket> UpdateData(Guid id, DateTime? updateCheckOut = null, DateTime? updateCheckIn = null, decimal? price = null)
         {
             // "construtor pra atualizar --> contém as configurações pra fazer o update"
             var update = Builders<Ticket>.Update;
 
-            // adicionando as propriedades e os valores que serão atualizados
-            var updateDefinition = update
-                .Set(nameof(updateCheckIn), updateCheckIn)
-              .Set(nameof(price), price);
+            var updateDefinitions = new List<UpdateDefinition<Ticket>>();
+
+            if (updateCheckIn.HasValue)
+            {
+                updateDefinitions.Add(update.Set(t => t.CheckInCurrent, updateCheckIn.Value));
+            }
+
+            if (updateCheckOut.HasValue)
+            {
+                updateDefinitions.Add(update.Set(t => t.CheckOutCurrent, updateCheckOut.Value));
+            }
+
+            if (price.HasValue)
+            {
+                updateDefinitions.Add(update.Set(t => t.PricePerHour, price.Value));
+            }
+
+            var updateDefinition = update.Combine(updateDefinitions);
 
             // faz a atualização
             var result = await _ticketCollection.FindOneAndUpdateAsync(
@@ -79,21 +85,15 @@ namespace EstacionamentoAPI.Repositories
             return result;
         }
 
-        //CheckOut
-        public async Task<Ticket> CheckOutTicket(Guid id)
+        //Check Status
+        public async Task<bool> FindStatusById(Guid id)
         {
             var ticket = await _ticketCollection.Find(ticket => ticket.Id == id).FirstOrDefaultAsync();
-        } 
 
-        //Check Status
-        public bool CheckStatus(Guid id)
-        {
-            var existingTicket = _tickets.Find(t => t.Id == id);
-
-            if(existingTicket == null)
+            if (ticket == null)
                 throw new ArgumentException("Não foi possível encontrar o Ticket");
             
-            return existingTicket.Status;
+            return ticket.Status;
         }
     }
 }

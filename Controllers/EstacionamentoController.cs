@@ -21,6 +21,7 @@ namespace EstacionamentoAPI.Controllers
             return Ok(checkIn);
         }
 
+        //Refatorar
         [HttpGet]
         public ActionResult<List<Ticket>> GetTickets
             (
@@ -32,6 +33,7 @@ namespace EstacionamentoAPI.Controllers
             return Ok(tickets);
         }
 
+        //Refatorar
         [HttpGet("{id}")]
         public ActionResult<Ticket> GetId
             (
@@ -41,19 +43,6 @@ namespace EstacionamentoAPI.Controllers
         {
             var ticket = estacionamentoRepository.GetById(id);
             
-            return Ok(ticket);
-        }
-
-        [HttpPut("{id}")]
-        public ActionResult UpdateData
-            (
-                [FromBody] Guid id,
-                [FromBody] UpdateDataRequest requestBody,
-                [FromServices] IEstacionamentoService estacionamentoService
-            )
-        {
-            var ticket = estacionamentoService.Update(id, requestBody.DateTime, requestBody.Price);
-
             return Ok(ticket);
         }
 
@@ -69,7 +58,7 @@ namespace EstacionamentoAPI.Controllers
             return Ok(ticketCheckOut);
         }
 
-
+        //Refatorar
         [HttpDelete("{id}")]
         public ActionResult Delete
             (
