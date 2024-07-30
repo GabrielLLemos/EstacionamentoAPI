@@ -11,62 +11,62 @@ namespace EstacionamentoAPI.Controllers
     public class EstacionamentoController : ControllerBase
     {
         [HttpPost]
-        public ActionResult<Ticket> Post
+        public async Task<ActionResult<Ticket>> Post
             (
-                decimal? price,
+                [FromBody] decimal? price,
                 [FromServices] IEstacionamentoService estacionamentoService
             )
         {
-            var checkIn = estacionamentoService.CheckIn(price);
+            var checkIn = await estacionamentoService.CheckIn(price);
             return Ok(checkIn);
         }
 
         //Refatorar
         [HttpGet]
-        public ActionResult<List<Ticket>> GetTickets
+        public async Task<ActionResult<List<Ticket>>> GetTickets
             (
                 [FromServices] IEstacionamentoRepository estacionamentoRepository
             )
         {
-            var tickets = estacionamentoRepository.ListData();
+            var tickets = await estacionamentoRepository.ListData();
 
             return Ok(tickets);
         }
 
         //Refatorar
         [HttpGet("{id}")]
-        public ActionResult<Ticket> GetId
+        public async Task<ActionResult<Ticket>> GetId
             (
-                [FromBody] Guid id,
+                Guid id,
                 [FromServices] IEstacionamentoRepository estacionamentoRepository
             )
         {
-            var ticket = estacionamentoRepository.GetById(id);
+            var ticket = await estacionamentoRepository.GetById(id);
             
             return Ok(ticket);
         }
 
         [HttpPut("{id}")]
-        public ActionResult Exit
+        public async Task<ActionResult> Exit
             (
-                [FromBody] Guid id,
+                Guid id,
                 [FromServices] IEstacionamentoService estacionamentoService
             )
         {
-            var ticketCheckOut = estacionamentoService.CheckOut(id);
+            var ticketCheckOut = await estacionamentoService.CheckOut(id);
 
             return Ok(ticketCheckOut);
         }
 
         //Refatorar
         [HttpDelete("{id}")]
-        public ActionResult Delete
+        public async Task<ActionResult> Delete
             (
-                [FromBody] Guid id,
+                Guid id,
                 [FromServices] IEstacionamentoRepository estacionamentoRepository
             )
         {
-            estacionamentoRepository.Delete(id);
+            await estacionamentoRepository.Delete(id);
 
             return NoContent();
         }
